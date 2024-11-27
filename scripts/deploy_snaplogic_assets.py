@@ -1,27 +1,21 @@
-import requests
 import argparse
 
-def deploy_pipeline(base_url, org, project, env, auth_token, pipeline_file):
-    headers = {
-        "Authorization": f"Bearer {auth_token}",
-        "Content-Type": "application/json"
-    }
-    url = f"{base_url}/api/1/rest/public/project/{org}/{project}/pipeline/{env}"
-    with open(pipeline_file, 'r') as file:
-        payload = file.read()
-    response = requests.post(url, headers=headers, data=payload)
-    if response.status_code == 200:
-        print(f"Successfully deployed pipeline: {pipeline_file}")
-    else:
-        print(f"Failed to deploy {pipeline_file}: {response.text}")
+def deploy_snaplogic_assets(base_url, org, project, env):
+    print(f"Deploying SnapLogic assets to environment: {env}")
+    print(f"Base URL: {base_url}")
+    print(f"Org: {org}, Project: {project}")
+    # Add deployment logic here
+    # Example: HTTP requests to SnapLogic APIs for deployment.
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--auth-token", required=True)
-    parser.add_argument("--base-url", required=True)
-    parser.add_argument("--org", required=True)
-    parser.add_argument("--project", required=True)
-    parser.add_argument("--env", required=True)
+def main():
+    parser = argparse.ArgumentParser(description="Deploy SnapLogic Assets")
+    parser.add_argument("--base-url", required=True, help="SnapLogic base URL")
+    parser.add_argument("--org", required=True, help="SnapLogic organization")
+    parser.add_argument("--project", required=True, help="SnapLogic project")
+    parser.add_argument("--env", required=True, help="Target environment (e.g., test, prod)")
     args = parser.parse_args()
 
-    deploy_pipeline(args.base_url, args.org, args.project, args.env, args.auth_token, "path/to/your/pipeline.json")
+    deploy_snaplogic_assets(args.base_url, args.org, args.project, args.env)
+
+if __name__ == "__main__":
+    main()
