@@ -4,8 +4,8 @@ def deploy_snaplogic_assets(base_url, org, project, env):
     print(f"Deploying SnapLogic assets to environment: {env}")
     print(f"Base URL: {base_url}")
     print(f"Org: {org}, Project: {project}")
-    # Add deployment logic here
-    # Example: HTTP requests to SnapLogic APIs for deployment.
+    # Your deployment logic here
+    # Example: Make an HTTP request to deploy assets.
 
 def main():
     parser = argparse.ArgumentParser(description="Deploy SnapLogic Assets")
