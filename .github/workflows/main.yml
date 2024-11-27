@@ -1,0 +1,27 @@
+stages:
+  - validate
+  - deploy
+  - test
+
+variables:
+  SNAPLOGIC_URL: "https://elastic.snaplogic.com"
+  SNAPLOGIC_USERNAME: "vilas.wagh@nihilent.com"
+  SNAPLOGIC_PASSWORD: "Vilas@123#"
+
+validate:
+  stage: validate
+  script:
+    - echo "Validating SnapLogic pipelines..."
+    - python validate_pipelines.py  # Custom script to check pipeline syntax.
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying SnapLogic pipelines..."
+    - python deploy_pipelines.py   # Script for deploying pipelines using SnapLogic public APIs.
+
+test:
+  stage: test
+  script:
+    - echo "Testing SnapLogic pipelines..."
+    - python run_pipeline_tests.py  # Script to run pipeline unit tests.
