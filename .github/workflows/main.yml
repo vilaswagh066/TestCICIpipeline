@@ -27,4 +27,4 @@ jobs:
           --base-url ${{ secrets.SNAPLOGIC_BASE_URL }} \
           --org ${{ secrets.SNAPLOGIC_ORG }} \
           --project ${{ secrets.SNAPLOGIC_PROJECT }} \
-          --env test
+          --env ${{ secrets.SNAPLOGIC_ENV }}
