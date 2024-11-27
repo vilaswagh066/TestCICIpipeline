@@ -1,29 +1,38 @@
-stages:
-  - validate
-  - deploy
+name: Deploy SnapLogic to Test Environment
 
-variables:
-  SNAPLOGIC_BASE_URL: "https://cdn.elastic.snaplogic.com"
-  SNAPLOGIC_ORG: "Parters"
-  SNAPLOGIC_PROJECT: "Nihilent/CICD-Dev1"
-  SNAPLOGIC_ENV: "test"  # Specify environment (e.g., test, prod)
-  SNAPLOGIC_USERNAME: "$SNAPLOGIC_USERNAME"  # Username from CI/CD secrets
-  SNAPLOGIC_PASSWORD: "$SNAPLOGIC_PASSWORD"  # Password from CI/CD secrets
-  SNAPLOGIC_AUTH_TOKEN: ""  # Placeholder for auth token
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Allow manual triggering
 
-validate:
-  stage: validate
-  script:
-    - echo "Validating SnapLogic pipelines..."
-    - python scripts/validate_snaplogic_assets.py  # Custom script for validation.
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-deploy:
-  stage: deploy
-  script:
-    - echo "Authenticating with SnapLogic..."
-    - export SNAPLOGIC_AUTH_TOKEN=$(curl -s -X POST "${SNAPLOGIC_BASE_URL}/api/1/rest/sls/auth/token" \
-        -d "username=${SNAPLOGIC_USERNAME}&password=${SNAPLOGIC_PASSWORD}" | jq -r '.access_token')
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
 
-    - echo "Deploying SnapLogic assets to test environment..."
-    - python scripts/deploy_snaplogic_assets.py --auth-token $SNAPLOGIC_AUTH_TOKEN --base-url $SNAPLOGIC_BASE_URL --org $SNAPLOGIC_ORG --project $SNAPLOGIC_PROJECT --env $SNAPLOGIC_ENV
+      - name: Install Dependencies
+        run: pip install requests jq
 
+      - name: Authenticate with SnapLogic
+        id: authenticate
+        run: |
+          AUTH_TOKEN=$(curl -s -X POST "${{ secrets.SNAPLOGIC_BASE_URL }}/api/1/rest/sls/auth/token" \
+          -d "username=${{ secrets.SNAPLOGIC_USERNAME }}&password=${{ secrets.SNAPLOGIC_PASSWORD }}" | jq -r '.access_token')
+          echo "AUTH_TOKEN=$AUTH_TOKEN" >> $GITHUB_ENV
+
+      - name: Deploy SnapLogic Pipelines
+        run: |
+          python scripts/deploy_snaplogic_assets.py \
+          --auth-token $AUTH_TOKEN \
+          --base-url ${{ secrets.SNAPLOGIC_BASE_URL }} \
+          --org ${{ secrets.SNAPLOGIC_ORG }} \
+          --project ${{ secrets.SNAPLOGIC_PROJECT }} \
+          --env test
