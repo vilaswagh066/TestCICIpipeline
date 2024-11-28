@@ -1,30 +1,30 @@
-# Actions workflow for automated deployment of SnapLogic assets
-name: SnapLogic CICD Sample
+name: Deploy SnapLogic to Test Environment
+ 
 on:
-push:
-branches:
-- Dev_GH_Space
-# Uncomment the below line if you need to execute the workflow manually.
-# workflow_dispatch:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+ 
 jobs:
-pull_merge_branches:
-runs-on: ubuntu-latest
-steps:
-- name: Checkout repository
-uses: actions/checkout@v4
-- name: Merge Dev to Prod
-uses: devmasx/merge-branch@master
-with:
-type: now
-
-
-from_branch: Dev_GH_Space
-target_branch: Prod_GH_Space
-github_token: ${{ secrets.ACTIONS_TOKEN }}
-- name: Checkout project assets to Prod project space
-run: |
-curl -s -X POST \
-
-${{vars.SNAP_URL}}/api/1/rest/public/project/pull/${{vars.SNAP_ORG}}/${{vars.PROJECT_SPACE}} \
--H "Content-Type:application/json" -H "Authorization:Basic ${{secrets.BASE64_TOKEN}}" \
--d '{"use_theirs":"true"}'
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+ 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+ 
+      - name: Install Dependencies
+        run: pip install requests jq
+ 
+      - name: Deploy SnapLogic Pipelines
+        run: |
+          python scripts/deploy_snaplogic_assets.py \
+          --base-url ${{ secrets.SNAPLOGIC_BASE_URL }} \
+          --org ${{ secrets.SNAPLOGIC_ORG }} \
+          --project ${{ secrets.SNAPLOGIC_PROJECT }} \
+          --env ${{ secrets.SNAPLOGIC_ENV }}
