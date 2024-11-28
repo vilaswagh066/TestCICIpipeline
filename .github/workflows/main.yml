@@ -1,5 +1,4 @@
 # Actions workflow for automated deployment of SnapLogic assets
-
 name: SnapLogic CICD Sample
 on:
 push:
